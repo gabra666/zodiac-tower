@@ -28,7 +28,7 @@
     [Parameter] public int Rotation { get; set; }
     [Parameter] public int SelectedPosition { get; set; } = -1;
 
-    private static readonly int[] X = { 110, 174, 174, 110, 46, 46 };
-    private static readonly int[] Y = { 34, 72, 138, 176, 138, 72 };
+    private static readonly int[] X = { 148, 186, 148, 72, 34, 72 };
+    private static readonly int[] Y = { 42, 105, 168, 168, 105, 42 };
     private int DisplayedSide(int position) => Unit!.Sides[(position + Rotation) % 6];
 }
