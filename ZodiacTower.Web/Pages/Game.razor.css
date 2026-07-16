@@ -1,0 +1,69 @@
+.game-controls { margin-bottom: 16px; }
+.depth-field input[type="range"] { height: 22px; padding: 0; accent-color: #17202b; border: 0; background: transparent; }
+.depth-field label { display: flex; justify-content: space-between; }
+.depth-field output { color: #17202b; font-size: .82rem; }
+.depth-scale { display: flex; justify-content: space-between; color: var(--muted); font-size: .62rem; }
+.search-note { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .72rem; }
+.search-note strong { color: #4c5863; }
+.game-score { display: grid; grid-template-columns: repeat(5, 1fr); margin-bottom: 16px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+.game-score div { min-width: 0; padding: 11px 15px; border-right: 1px solid var(--line); }
+.game-score div:last-child { border-right: 0; }
+.game-score span { display: block; color: var(--muted); font-size: .64rem; font-weight: 750; }
+.game-score strong { display: block; margin-top: 2px; font-size: .98rem; font-variant-numeric: tabular-nums; }
+.hand-section { padding: 14px 0; }
+.hand-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.hand-heading span, .played-card > span, .round-result > span { display: block; color: var(--muted); font-size: .63rem; font-weight: 800; text-transform: uppercase; }
+.hand-heading strong { display: block; margin-top: 2px; font-size: .88rem; }
+.hand-heading small { color: var(--muted); font-size: .66rem; }
+.game-hand { display: grid; grid-template-columns: repeat(5, minmax(118px, 1fr)); gap: 8px; }
+.game-card { min-width: 0; padding: 10px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 6px; text-align: left; }
+.player-card { position: relative; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s; }
+.player-card:hover, .player-card:focus-visible { z-index: 1; border-color: #8a691f; outline: none; box-shadow: 0 4px 14px rgba(23, 32, 43, .13); transform: translateY(-2px); }
+.enemy-card { background: #f8f9fa; }
+.card-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 5px; }
+.card-heading strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: .76rem; }
+.card-heading span { flex: none; color: var(--muted); font-size: .6rem; }
+.game-card ::deep .unit-hex { max-width: 135px; }
+.active-stat { display: flex; justify-content: space-between; align-items: center; padding-top: 7px; border-top: 1px solid #edf0f2; }
+.active-stat span { color: var(--muted); font-size: .62rem; }
+.active-stat strong { font-size: .9rem; }
+.play-label { display: block; margin-top: 7px; padding: 6px; color: #fff; background: #17202b; border-radius: 3px; text-align: center; font-size: .64rem; font-weight: 800; }
+.battle-stage { min-height: 260px; display: grid; grid-template-columns: minmax(150px, 1fr) 170px minmax(150px, 1fr); align-items: center; gap: 14px; padding: 16px; background: #e9edf0; border: 1px solid #d5dbe0; border-radius: 6px; }
+.stage-empty { grid-column: 1 / -1; text-align: center; }
+.stage-empty span { color: #86610f; font-size: .66rem; font-weight: 850; text-transform: uppercase; }
+.stage-empty strong { display: block; margin-top: 5px; font-size: 1rem; }
+.stage-empty p { margin: 4px 0 0; color: var(--muted); font-size: .72rem; }
+.played-card { width: 100%; max-width: 230px; padding: 11px; background: #fff; border: 1px solid #cfd5da; border-radius: 6px; text-align: center; }
+.player-played { justify-self: end; }
+.enemy-played { justify-self: start; }
+.played-card > strong { display: block; margin-top: 2px; font-size: .8rem; }
+.played-card > small { color: var(--muted); font-size: .66rem; }
+.played-card ::deep .unit-hex { max-width: 128px; }
+.round-result { text-align: center; }
+.round-values { margin: 4px 0; font-size: 1.65rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.round-values i { padding: 0 4px; color: #929ba3; font-style: normal; }
+.round-result > strong { display: block; color: #805b0d; font-size: .78rem; }
+.round-result > small { display: block; margin-top: 5px; color: var(--muted); font-size: .62rem; }
+.game-over { min-height: 165px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+.game-over > strong { font-size: 1.15rem; }
+.game-over > span { color: var(--muted); font-size: .74rem; }
+.game-over .primary-action { margin-top: 7px; }
+@media (max-width: 980px) {
+    .game-hand { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
+}
+@media (max-width: 700px) {
+    .game-score { grid-template-columns: repeat(3, 1fr); }
+    .game-score div { border-bottom: 1px solid var(--line); }
+    .game-score div:nth-child(3) { border-right: 0; }
+    .game-score div:nth-child(n+4) { border-bottom: 0; }
+    .game-score div:last-child { grid-column: span 2; }
+    .game-hand { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .battle-stage { grid-template-columns: 1fr 100px 1fr; min-height: 220px; gap: 7px; padding: 10px; }
+    .played-card { padding: 8px 5px; }
+    .played-card ::deep .unit-hex { max-width: 100px; }
+    .round-values { font-size: 1.25rem; }
+}
+@media (max-width: 400px) {
+    .battle-stage { grid-template-columns: 1fr 82px 1fr; }
+    .game-card { padding: 8px; }
+}

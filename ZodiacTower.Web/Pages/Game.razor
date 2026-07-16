@@ -1,0 +1,166 @@
+@page "/juego"
+@inject CardGameService Games
+
+<PageTitle>Juego | Zodiac Tower</PageTitle>
+
+<header class="page-heading">
+    <div>
+        <span class="eyebrow">Partida contra el motor</span>
+        <h1>Juego de cartas</h1>
+        <p>Elige una unidad por ronda. La IA responde con una busqueda de arbol sobre las cartas que quedan.</p>
+    </div>
+</header>
+
+<section class="tool-band game-controls" aria-label="Configuracion de partida">
+    <div class="control-grid compact">
+        <div class="field">
+            <label for="game-floor">Piso</label>
+            <select id="game-floor" @bind="floor">
+                @foreach (var item in FloorCatalog.All)
+                {
+                    <option value="@item.Floor">Piso @item.Floor</option>
+                }
+            </select>
+        </div>
+        <div class="field">
+            <label for="game-seed">Semilla</label>
+            <input id="game-seed" type="number" @bind="seed" />
+        </div>
+        <div class="field depth-field">
+            <label for="ai-depth">Profundidad IA <output>@aiDepth</output></label>
+            <input id="ai-depth" type="range" min="1" max="5" step="1" @bind="aiDepth" @bind:event="oninput" />
+            <div class="depth-scale" aria-hidden="true"><span>Rapida</span><span>Anticipa @aiDepth @(aiDepth == 1 ? "ronda" : "rondas")</span></div>
+        </div>
+        <button class="primary-action" @onclick="NewGame">Nueva partida</button>
+    </div>
+    <p class="search-note"><strong>Profundidad @aiDepth:</strong> la IA evalua esta ronda@(aiDepth > 1 ? $" y hasta {aiDepth - 1} futuras" : string.Empty), suponiendo que ambos jugadores eligen su mejor respuesta.</p>
+</section>
+
+<section class="game-score" aria-live="polite">
+    <div><span>Ronda</span><strong>@Math.Min(state.RoundNumber + 1, CardGameService.DefaultHandSize) / @CardGameService.DefaultHandSize</strong></div>
+    <div><span>Jugador</span><strong>@state.PlayerScore</strong></div>
+    <div><span>Empates</span><strong>@state.Draws</strong></div>
+    <div><span>IA</span><strong>@state.EnemyScore</strong></div>
+    <div><span>Lado activo</span><strong>@DisplayPlayerSide : @DisplayEnemySide</strong></div>
+</section>
+
+<section class="hand-section enemy-section">
+    <div class="hand-heading">
+        <div><span>Mano de la IA</span><strong>@state.EnemyHand.Count cartas disponibles</strong></div>
+        <small>Informacion abierta</small>
+    </div>
+    <div class="game-hand enemy-hand">
+        @foreach (var card in state.EnemyHand)
+        {
+            var profile = ZodiacCatalog.Get(card.Sign);
+            <article class="game-card enemy-card">
+                <div class="card-heading"><strong>@ZodiacText.Sign(card.Sign)</strong><span>@ZodiacText.Element(profile.Element)</span></div>
+                <UnitHex Unit="card" Rotation="state.RoundNumber" SelectedPosition="4" />
+                <div class="active-stat"><span>Lado activo</span><strong>@card.Sides[CardGameService.EnemySideForRound(state.RoundNumber)]</strong></div>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="battle-stage" aria-live="polite">
+    @if (lastRound is null)
+    {
+        <div class="stage-empty">
+            <span>Ronda 1</span>
+            <strong>Elige una carta de tu mano</strong>
+            <p>Se enfrentaran los lados resaltados.</p>
+        </div>
+    }
+    else
+    {
+        <article class="played-card player-played">
+            <span>Tu carta</span>
+            <strong>@ZodiacText.Sign(lastRound.PlayerCard.Sign)</strong>
+            <UnitHex Unit="lastRound.PlayerCard" Rotation="lastRound.State.RoundNumber - 1" SelectedPosition="1" />
+            <small>@lastRound.Battle.AttackerBaseValue + @lastRound.Battle.AttackerZodiacBonus bono</small>
+        </article>
+        <div class="round-result">
+            <span>Ronda @lastRound.State.RoundNumber</span>
+            <div class="round-values">@lastRound.Battle.AttackerFinalValue <i>:</i> @lastRound.Battle.DefenderFinalValue</div>
+            <strong>@RoundOutcome(lastRound.Battle.Outcome)</strong>
+            <small>@lastRound.AiDecision.NodesEvaluated.ToString("N0") nodos evaluados</small>
+        </div>
+        <article class="played-card enemy-played">
+            <span>Carta de la IA</span>
+            <strong>@ZodiacText.Sign(lastRound.EnemyCard.Sign)</strong>
+            <UnitHex Unit="lastRound.EnemyCard" Rotation="lastRound.State.RoundNumber - 1" SelectedPosition="4" />
+            <small>@lastRound.Battle.DefenderBaseValue + @lastRound.Battle.DefenderZodiacBonus bono</small>
+        </article>
+    }
+</section>
+
+<section class="hand-section player-section">
+    <div class="hand-heading">
+        <div>
+            <span>Tu mano</span>
+            <strong>@(state.IsOver ? FinalOutcome() : "Selecciona una carta")</strong>
+        </div>
+        <small>@state.PlayerHand.Count cartas disponibles</small>
+    </div>
+    @if (state.IsOver)
+    {
+        <div class="game-over">
+            <strong>@FinalOutcome()</strong>
+            <span>Marcador final @state.PlayerScore : @state.EnemyScore</span>
+            <button class="primary-action" @onclick="NewGame">Jugar otra vez</button>
+        </div>
+    }
+    else
+    {
+        <div class="game-hand player-hand">
+            @for (int index = 0; index < state.PlayerHand.Count; index++)
+            {
+                int cardIndex = index;
+                var card = state.PlayerHand[index];
+                var profile = ZodiacCatalog.Get(card.Sign);
+                <button class="game-card player-card" @onclick="() => PlayCard(cardIndex)" aria-label="Jugar @ZodiacText.Sign(card.Sign), valor activo @card.Sides[CardGameService.PlayerSideForRound(state.RoundNumber)]">
+                    <span class="card-heading"><strong>@ZodiacText.Sign(card.Sign)</strong><span>@ZodiacText.Element(profile.Element)</span></span>
+                    <UnitHex Unit="card" Rotation="state.RoundNumber" SelectedPosition="1" />
+                    <span class="active-stat"><span>Lado activo</span><strong>@card.Sides[CardGameService.PlayerSideForRound(state.RoundNumber)]</strong></span>
+                    <span class="play-label">Jugar carta</span>
+                </button>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private int floor = 4;
+    private int seed = 184728;
+    private int aiDepth = 3;
+    private GameState state = null!;
+    private GameRoundResult? lastRound;
+
+    protected override void OnInitialized() => NewGame();
+
+    private void NewGame()
+    {
+        state = Games.CreateGame(FloorCatalog.Get(floor), seed);
+        lastRound = null;
+    }
+
+    private void PlayCard(int cardIndex)
+    {
+        lastRound = Games.PlayRound(state, cardIndex, aiDepth);
+        state = lastRound.State;
+    }
+
+    private static string RoundOutcome(BattleOutcome outcome) => outcome switch
+    {
+        BattleOutcome.AttackerWins => "Ganas la ronda",
+        BattleOutcome.DefenderWins => "La IA gana la ronda",
+        _ => "Ronda empatada"
+    };
+
+    private string FinalOutcome() => state.PlayerScore == state.EnemyScore
+        ? "Partida empatada"
+        : state.PlayerScore > state.EnemyScore ? "Ganaste la partida" : "La IA gana la partida";
+
+    private int DisplayPlayerSide => (state.IsOver ? lastRound!.PlayerSide : CardGameService.PlayerSideForRound(state.RoundNumber)) + 1;
+    private int DisplayEnemySide => (state.IsOver ? lastRound!.EnemySide : CardGameService.EnemySideForRound(state.RoundNumber)) + 1;
+}
