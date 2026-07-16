@@ -24,7 +24,25 @@
                 <li class="distribution-step">
                     <div class="step-heading">
                         <strong>Paso @(index + 1)</strong>
-                        <span>Lados @AppliedSideText(step) reciben +1</span>
+                        <span>@PointsAddedText(step.PointsAdded)</span>
+                    </div>
+                    <div class="pattern-applied">
+                        <svg class="pattern-map" viewBox="0 0 62 58" role="img" aria-label="Lados @AppliedSideText(step) reciben un punto">
+                            <polygon points="31,3 56,16 56,42 31,55 6,42 6,16" />
+                            @for (var side = 0; side < SidePositions.Length; side++)
+                            {
+                                var position = SidePositions[side];
+                                var isApplied = step.AppliedSides.Contains(side);
+                                <g>
+                                    <circle class="@(isApplied ? "applied" : null)" cx="@position.X" cy="@position.Y" r="6" />
+                                    <text class="@(isApplied ? "applied" : null)" x="@position.X" y="@position.Y">@(side + 1)</text>
+                                </g>
+                            }
+                        </svg>
+                        <div>
+                            <span>Patron aplicado</span>
+                            <strong>Lados @AppliedSideText(step) reciben +1</strong>
+                        </div>
                     </div>
                     <div class="state-change">
                         <div class="side-state">
@@ -51,6 +69,11 @@
     [Parameter, EditorRequired]
     public Unit? Unit { get; set; }
 
+    private static readonly (int X, int Y)[] SidePositions =
+    {
+        (31, 6), (54, 18), (54, 40), (31, 52), (8, 40), (8, 18)
+    };
+
     private static RenderFragment SideValues(IEnumerable<int> values) => builder =>
     {
         var sequence = 0;
@@ -64,4 +87,7 @@
 
     private static string AppliedSideText(DistributionStep step) =>
         string.Join(", ", step.AppliedSides.Select(side => side + 1));
+
+    private static string PointsAddedText(int points) =>
+        points == 1 ? "1 punto en este paso" : $"{points} puntos en este paso";
 }
