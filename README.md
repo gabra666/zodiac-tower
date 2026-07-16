@@ -22,3 +22,11 @@ dotnet test
 ```
 
 The generated `ZodiacTower.Core.dll` can later be copied into a Unity project's `Assets/Plugins` directory.
+
+## GitHub Pages
+
+Pushes to `main` automatically publish the Blazor app with the workflow in `.github/workflows/deploy-pages.yml`.
+
+For the first deployment, open the repository's **Settings > Pages** and set **Source** to **GitHub Actions**. The published site is available at:
+
+https://gabra666.github.io/zodiac-tower/
