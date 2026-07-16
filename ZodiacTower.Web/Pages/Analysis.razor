@@ -18,6 +18,7 @@
         <div class="field"><label for="analysis-seed">Semilla</label><input id="analysis-seed" type="number" @bind="seed" /></div>
         <button class="primary-action" disabled="@running" @onclick="RunAnalysis">@(running ? "Calculando..." : "Ejecutar analisis")</button>
     </div>
+    <FloorRuleSummary Floor="floor" />
 </section>
 
 @if (summaries.Count == 0)

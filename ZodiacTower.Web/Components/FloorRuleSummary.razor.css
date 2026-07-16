@@ -1,0 +1,49 @@
+.floor-rule-summary {
+    display: grid;
+    grid-template-columns: .65fr repeat(3, 1fr);
+    margin-top: 12px;
+    background: #f7f8f9;
+    border: 1px solid #e0e4e8;
+    border-radius: 4px;
+}
+
+.floor-rule-summary > div {
+    min-width: 0;
+    padding: 10px 13px;
+    border-right: 1px solid #e0e4e8;
+}
+
+.floor-rule-summary > div:last-child {
+    border-right: 0;
+}
+
+.floor-rule-summary span,
+.floor-rule-summary strong {
+    display: block;
+}
+
+.floor-rule-summary span {
+    color: #707b85;
+    font-size: .65rem;
+    font-weight: 750;
+}
+
+.floor-rule-summary strong {
+    margin-top: 2px;
+    color: #26323d;
+    font-size: .84rem;
+}
+
+@media (max-width: 700px) {
+    .floor-rule-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .floor-rule-summary > div:nth-child(2) {
+        border-right: 0;
+    }
+
+    .floor-rule-summary > div:nth-child(-n+2) {
+        border-bottom: 1px solid #e0e4e8;
+    }
+}

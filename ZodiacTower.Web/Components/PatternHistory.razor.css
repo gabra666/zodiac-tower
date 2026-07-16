@@ -1,0 +1,81 @@
+.pattern-history {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #edf0f2;
+}
+
+.pattern-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #56626e;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.pattern-heading strong {
+    color: #818b94;
+    font-size: .62rem;
+}
+
+.pattern-sequence {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: thin;
+}
+
+.pattern-step {
+    flex: 0 0 58px;
+    min-width: 0;
+    padding: 5px 4px 6px;
+    text-align: center;
+    background: #f7f8f9;
+    border: 1px solid #e6e9ec;
+    border-radius: 4px;
+}
+
+.pattern-step svg {
+    display: block;
+    width: 48px;
+    height: 46px;
+    margin: 0 auto 2px;
+}
+
+.pattern-hex {
+    fill: #fff;
+    stroke: #cbd2d8;
+    stroke-width: 1.5;
+}
+
+.pattern-dot {
+    fill: #dce1e5;
+    stroke: #fff;
+    stroke-width: 1.5;
+}
+
+.pattern-dot.active {
+    fill: #c58d18;
+}
+
+.pattern-step span,
+.pattern-step strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pattern-step span {
+    color: #78838d;
+    font-size: .58rem;
+}
+
+.pattern-step strong {
+    margin-top: 1px;
+    color: #303c47;
+    font-size: .63rem;
+}

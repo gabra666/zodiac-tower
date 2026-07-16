@@ -1,0 +1,27 @@
+@{
+    var rules = FloorCatalog.Get(Floor);
+}
+
+<div class="floor-rule-summary" aria-label="Limites del piso @Floor">
+    <div>
+        <span>Piso</span>
+        <strong>@rules.Floor</strong>
+    </div>
+    <div>
+        <span>Presupuesto</span>
+        <strong>@rules.MinimumBudget - @rules.MaximumBudget</strong>
+    </div>
+    <div>
+        <span>Objetivo</span>
+        <strong>@rules.TargetBudget</strong>
+    </div>
+    <div>
+        <span>Valor por lado</span>
+        <strong>@rules.MinimumSideValue - @rules.MaximumSideValue</strong>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Floor { get; set; }
+}

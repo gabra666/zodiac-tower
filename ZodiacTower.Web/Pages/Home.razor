@@ -49,6 +49,8 @@
     </div>
 </section>
 
+<FloorRuleSummary Floor="floor" />
+
 @if (units.Count > 0)
 {
     var rules = FloorCatalog.Get(floor);
@@ -79,11 +81,43 @@
                     <span class="meta-chip">@ZodiacText.Modality(profile.Modality)</span>
                     <span class="meta-chip">Diferencia @unit.Spread</span>
                 </div>
-                <p class="trace">Patrones: @Trace(unit)</p>
+                <PatternHistory Steps="unit.PatternHistory" />
             </article>
         }
     </div>
 }
+
+<div class="section-heading">
+    <h2>Limites por piso</h2>
+    <span>Reglas usadas por el generador</span>
+</div>
+<div class="floor-table-wrap">
+    <table class="floor-table">
+        <thead>
+            <tr>
+                <th scope="col">Piso</th>
+                <th scope="col">Presupuesto min.</th>
+                <th scope="col">Objetivo</th>
+                <th scope="col">Presupuesto max.</th>
+                <th scope="col">Lado min.</th>
+                <th scope="col">Lado max.</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rules in FloorCatalog.All)
+            {
+                <tr class="@(rules.Floor == floor ? "selected" : null)">
+                    <th scope="row">@rules.Floor</th>
+                    <td>@rules.MinimumBudget</td>
+                    <td>@rules.TargetBudget</td>
+                    <td>@rules.MaximumBudget</td>
+                    <td>@rules.MinimumSideValue</td>
+                    <td>@rules.MaximumSideValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
     private int floor = 4;
@@ -107,6 +141,4 @@
         ? (ZodiacSign)random.Next(0, 12)
         : (ZodiacSign)int.Parse(signSelection);
 
-    private static string Trace(Unit unit) => string.Join("  >  ", unit.PatternHistory.Take(5)
-        .Select(step => $"{step.DistributedAt}: [{string.Join(",", step.ActiveSides.Select(side => side + 1))}]"));
 }

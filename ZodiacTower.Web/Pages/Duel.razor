@@ -19,6 +19,7 @@
         <div class="field"><label for="seed-b">Semilla B</label><input id="seed-b" type="number" @bind="seedB" /></div>
         <button class="primary-action" @onclick="CreateUnits">Crear duelo</button>
     </div>
+    <FloorRuleSummary Floor="floor" />
     <div class="rule-row">
         <label class="toggle"><input type="checkbox" @bind="rules.UseElement" /> Ventaja elemental</label>
         <label class="toggle"><input type="checkbox" @bind="rules.UsePolarity" /> Polaridad opuesta</label>

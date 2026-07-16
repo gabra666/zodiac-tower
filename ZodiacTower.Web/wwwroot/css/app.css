@@ -34,7 +34,14 @@ button, input, select { font: inherit; }
 .seed-tag { padding: 4px 6px; background: #f1f3f5; border-radius: 3px; color: #56616c; font-family: Consolas, monospace; font-size: .67rem; }
 .meta-row { display: flex; flex-wrap: wrap; gap: 5px; padding-top: 10px; border-top: 1px solid #edf0f2; }
 .meta-chip { padding: 4px 7px; background: #f4f6f7; border-radius: 3px; color: #53606c; font-size: .68rem; font-weight: 700; }
-.trace { margin: 9px 0 0; color: #7a858e; font-size: .66rem; }
+.floor-table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+.floor-table { width: 100%; min-width: 650px; border-collapse: collapse; font-size: .76rem; font-variant-numeric: tabular-nums; }
+.floor-table th, .floor-table td { padding: 10px 14px; text-align: right; border-bottom: 1px solid #edf0f2; }
+.floor-table thead th { color: #5d6873; background: #f7f8f9; font-size: .66rem; text-transform: uppercase; }
+.floor-table th:first-child, .floor-table td:first-child { text-align: left; }
+.floor-table tbody tr:last-child th, .floor-table tbody tr:last-child td { border-bottom: 0; }
+.floor-table tbody tr.selected { background: #fff8e8; box-shadow: inset 3px 0 0 var(--accent); }
+.floor-table tbody tr.selected th { color: #815c0d; }
 .duel-board { display: grid; grid-template-columns: minmax(240px, 1fr) 190px minmax(240px, 1fr); gap: 18px; align-items: center; margin-top: 18px; }
 .fighter { padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
 .fighter-title { display: flex; justify-content: space-between; align-items: baseline; }
