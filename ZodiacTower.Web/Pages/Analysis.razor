@@ -30,7 +30,7 @@ else
     <div class="summary-strip">
         <div class="summary-item"><span>Unidades procesadas</span><strong>@((samples * 3).ToString("N0"))</strong></div>
         <div class="summary-item"><span>Piso</span><strong>@floor</strong></div>
-        <div class="summary-item"><span>Mayor diferencia media</span><strong>@summaries.Max(item => item.AverageSpread).ToString("0.00")</strong></div>
+        <div class="summary-item"><span>Mayor rango medio</span><strong>@summaries.Max(item => item.AverageSpread).ToString("0.00")</strong></div>
         <div class="summary-item"><span>Lados al maximo</span><strong>@summaries.Sum(item => item.MaxedSides).ToString("N0")</strong></div>
     </div>
     <div class="analysis-grid">
@@ -40,7 +40,7 @@ else
                 <h3>@ZodiacText.Modality(summary.Modality)</h3>
                 <p>@summary.Count.ToString("N0") unidades - potencia media @summary.AveragePower.ToString("0.00")</p>
                 <div class="metric-pair">
-                    <div><span>Diferencia media</span><strong>@summary.AverageSpread.ToString("0.00")</strong></div>
+                    <div><span>Rango medio</span><strong>@summary.AverageSpread.ToString("0.00")</strong></div>
                     <div><span>Especializadas</span><strong>@summary.SpecializedPercent.ToString("0.0")%</strong></div>
                     <div><span>Equilibradas</span><strong>@summary.BalancedPercent.ToString("0.0")%</strong></div>
                 </div>

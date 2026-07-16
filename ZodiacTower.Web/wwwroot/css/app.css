@@ -26,7 +26,7 @@ button, input, select { font: inherit; }
 .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 15px; margin: 26px 0 12px; }
 .section-heading h2 { margin: 0; font-size: 1.02rem; font-weight: 800; }
 .section-heading span { color: var(--muted); font-size: .76rem; }
-.unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .unit-card { padding: 15px; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
 .unit-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .unit-card-head h3 { margin: 0; font-size: .98rem; font-weight: 850; }

@@ -58,7 +58,7 @@
         <div class="summary-item"><span>Unidades</span><strong>@units.Count.ToString("N0")</strong></div>
         <div class="summary-item"><span>Potencia media</span><strong>@units.Average(unit => unit.TotalPower).ToString("0.0")</strong></div>
         <div class="summary-item"><span>Rango del piso</span><strong>@rules.MinimumBudget - @rules.MaximumBudget</strong></div>
-        <div class="summary-item"><span>Mayor diferencia</span><strong>@units.Max(unit => unit.Spread)</strong></div>
+        <div class="summary-item"><span>Mayor rango entre lados</span><strong>@units.Max(unit => unit.Spread)</strong></div>
     </div>
 
     <div class="section-heading">
@@ -79,9 +79,9 @@
                     <span class="meta-chip">@ZodiacText.Element(profile.Element)</span>
                     <span class="meta-chip">@ZodiacText.Polarity(profile.Polarity)</span>
                     <span class="meta-chip">@ZodiacText.Modality(profile.Modality)</span>
-                    <span class="meta-chip">Diferencia @unit.Spread</span>
+                    <span class="meta-chip" title="Valor mayor menos valor menor">Rango: @unit.Sides.Max() - @unit.Sides.Min() = @unit.Spread</span>
                 </div>
-                <PatternHistory Steps="unit.PatternHistory" />
+                <PatternHistory Unit="unit" />
             </article>
         }
     </div>
@@ -120,10 +120,10 @@
 </div>
 
 @code {
-    private int floor = 4;
+    private int floor = 1;
     private string signSelection = "random";
-    private int seed = 184729;
-    private int amount = 10;
+    private int seed = 184728;
+    private int amount = 1;
     private List<Unit> units = new();
 
     protected override void OnInitialized() => Generate();

@@ -31,23 +31,30 @@ public sealed class UnitGenerator : IUnitGenerator
         bool thresholdChanged = false;
         var profile = ZodiacCatalog.Get(sign);
         var history = new List<PatternStep>();
+        var distributionHistory = new List<DistributionStep>();
         int[] pattern = PickPattern(random, sides, floor.MaximumSideValue);
         history.Add(new PatternStep(0, pattern));
 
         while (remaining > 0)
         {
-            int added = DistributeOnce(pattern, sides, floor.MaximumSideValue, ref remaining);
+            int[] sidesBefore = (int[])sides.Clone();
+            int[] appliedSides = DistributeOnce(pattern, sides, floor.MaximumSideValue, ref remaining);
+            int added = appliedSides.Length;
+            if (added > 0)
+                distributionHistory.Add(new DistributionStep(distributed, appliedSides, sidesBefore, (int[])sides.Clone()));
+
             distributed += added;
             iteration++;
 
-            if (added == 0 || ShouldChange(profile.Modality, distributed, totalToDistribute, iteration, ref thresholdChanged))
+            bool shouldChange = ShouldChange(profile.Modality, distributed, totalToDistribute, iteration, ref thresholdChanged);
+            if (remaining > 0 && (added == 0 || shouldChange))
             {
                 pattern = PickPattern(random, sides, floor.MaximumSideValue);
                 history.Add(new PatternStep(distributed, pattern));
             }
         }
 
-        return new Unit(seed, sign, floor.Floor, budget, sides, history);
+        return new Unit(seed, sign, floor.Floor, budget, sides, history, distributionHistory);
     }
 
     private static bool ShouldChange(Modality modality, int distributed, int total, int iteration, ref bool thresholdChanged)
@@ -65,9 +72,9 @@ public sealed class UnitGenerator : IUnitGenerator
         return false;
     }
 
-    private static int DistributeOnce(int[] pattern, int[] sides, int maximum, ref int remaining)
+    private static int[] DistributeOnce(int[] pattern, int[] sides, int maximum, ref int remaining)
     {
-        int added = 0;
+        var appliedSides = new List<int>();
         foreach (int side in pattern)
         {
             if (remaining == 0)
@@ -77,10 +84,10 @@ public sealed class UnitGenerator : IUnitGenerator
 
             sides[side]++;
             remaining--;
-            added++;
+            appliedSides.Add(side);
         }
 
-        return added;
+        return appliedSides.ToArray();
     }
 
     private static int[] PickPattern(IRandomSource random, int[] sides, int maximum)

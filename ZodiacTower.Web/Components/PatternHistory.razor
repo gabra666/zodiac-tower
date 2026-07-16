@@ -1,37 +1,67 @@
-<div class="pattern-history" aria-label="Historial completo de patrones">
-    <div class="pattern-heading">
-        <span>Patrones usados</span>
-        <strong>@Steps.Count pasos</strong>
-    </div>
-    <div class="pattern-sequence">
-        @foreach (var step in Steps)
-        {
-            <div class="pattern-step">
-                <svg viewBox="0 0 54 52" role="img" aria-label="Lados activos @ActiveSideText(step)">
-                    <polygon class="pattern-hex" points="27,3 48,15 48,37 27,49 6,37 6,15" />
-                    @for (var side = 0; side < SidePositions.Length; side++)
-                    {
-                        var position = SidePositions[side];
-                        <circle class="@(step.ActiveSides.Contains(side) ? "pattern-dot active" : "pattern-dot")"
-                                cx="@position.X" cy="@position.Y" r="4.5" />
-                    }
-                </svg>
-                <span>@(step.DistributedAt == 0 ? "Inicio" : $"Tras {step.DistributedAt} pts")</span>
-                <strong>@ActiveSideText(step)</strong>
-            </div>
-        }
-    </div>
-</div>
+@if (Unit is not null)
+{
+    var rules = FloorCatalog.Get(Unit.Floor);
+    var basePoints = rules.MinimumSideValue * 6;
+    var pointsToDistribute = Unit.Budget - basePoints;
+
+    <section class="distribution-history" aria-label="Historial de reparto de puntos">
+        <div class="history-heading">
+            <span>Historial de reparto</span>
+            <strong>@Unit.DistributionHistory.Count pasos</strong>
+        </div>
+
+        <div class="point-summary">
+            <div><span>Base inicial</span><strong>6 x @rules.MinimumSideValue = @basePoints</strong></div>
+            <div><span>Puntos a repartir</span><strong>@pointsToDistribute</strong></div>
+            <div><span>Presupuesto final</span><strong>@Unit.Budget</strong></div>
+        </div>
+
+        <ol class="distribution-list">
+            @for (var index = 0; index < Unit.DistributionHistory.Count; index++)
+            {
+                var step = Unit.DistributionHistory[index];
+                var pending = pointsToDistribute - step.DistributedAfter;
+                <li class="distribution-step">
+                    <div class="step-heading">
+                        <strong>Paso @(index + 1)</strong>
+                        <span>Lados @AppliedSideText(step) reciben +1</span>
+                    </div>
+                    <div class="state-change">
+                        <div class="side-state">
+                            <span>Antes</span>
+                            <div class="side-values">@SideValues(step.SidesBefore)</div>
+                        </div>
+                        <span class="state-arrow" aria-hidden="true">&rarr;</span>
+                        <div class="side-state">
+                            <span>Despues</span>
+                            <div class="side-values">@SideValues(step.SidesAfter)</div>
+                        </div>
+                    </div>
+                    <div class="step-totals">
+                        <span>@step.DistributedAfter repartidos</span>
+                        <span>@pending pendientes</span>
+                    </div>
+                </li>
+            }
+        </ol>
+    </section>
+}
 
 @code {
     [Parameter, EditorRequired]
-    public IReadOnlyList<PatternStep> Steps { get; set; } = Array.Empty<PatternStep>();
+    public Unit? Unit { get; set; }
 
-    private static readonly (int X, int Y)[] SidePositions =
+    private static RenderFragment SideValues(IEnumerable<int> values) => builder =>
     {
-        (27, 5), (47, 16), (47, 36), (27, 47), (7, 36), (7, 16)
+        var sequence = 0;
+        foreach (var value in values)
+        {
+            builder.OpenElement(sequence++, "span");
+            builder.AddContent(sequence++, value);
+            builder.CloseElement();
+        }
     };
 
-    private static string ActiveSideText(PatternStep step) =>
-        string.Join(", ", step.ActiveSides.Select(side => side + 1));
+    private static string AppliedSideText(DistributionStep step) =>
+        string.Join(", ", step.AppliedSides.Select(side => side + 1));
 }
