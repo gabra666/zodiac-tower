@@ -67,8 +67,11 @@ public sealed class UnitGeneratorTests
     }
 
     [Fact]
-    public void FixedUnitsSwitchToTheOppositePattern()
+    public void FixedUnitsReconfigureWithinTheirOppositePairs()
     {
+        bool sawPartialSwitch = false;
+        bool sawFullSwitch = false;
+
         foreach (var floor in FloorCatalog.All)
         {
             for (int seed = 1; seed <= 100; seed++)
@@ -76,12 +79,35 @@ public sealed class UnitGeneratorTests
                 var unit = _generator.Generate(floor, ZodiacSign.Taurus, seed);
 
                 Assert.Equal(2, unit.PatternHistory.Count);
-                int[] expectedOpposites = unit.PatternHistory[0].ActiveSides
-                    .Select(Unit.OppositeSide)
-                    .OrderBy(side => side)
-                    .ToArray();
-                Assert.Equal(expectedOpposites, unit.PatternHistory[1].ActiveSides);
+                int switchedAxes = 0;
+                for (int axis = 0; axis < 3; axis++)
+                {
+                    int initialSide = Assert.Single(unit.PatternHistory[0].ActiveSides, side => side % 3 == axis);
+                    int followUpSide = Assert.Single(unit.PatternHistory[1].ActiveSides, side => side % 3 == axis);
+                    Assert.True(followUpSide == initialSide || followUpSide == Unit.OppositeSide(initialSide));
+                    if (followUpSide == Unit.OppositeSide(initialSide))
+                        switchedAxes++;
+                }
+
+                sawPartialSwitch |= switchedAxes is 1 or 2;
+                sawFullSwitch |= switchedAxes == 3;
             }
         }
+
+        Assert.True(sawPartialSwitch);
+        Assert.True(sawFullSwitch);
+    }
+
+    [Fact]
+    public void FixedBalanceRateStaysNearTarget()
+    {
+        var floor = FloorCatalog.Get(4);
+        const int samples = 5_000;
+        int balanced = Enumerable.Range(0, samples)
+            .Select(index => _generator.Generate(floor, ZodiacSign.Taurus, 99173 + 1_000_003 + index))
+            .Count(unit => unit.Spread <= 1);
+        double balancedPercent = balanced * 100d / samples;
+
+        Assert.InRange(balancedPercent, 40d, 50d);
     }
 }

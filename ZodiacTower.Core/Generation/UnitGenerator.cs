@@ -17,6 +17,7 @@ public sealed class UnitGenerator : IUnitGenerator
 {
     private const double CardinalChangePoint = 0.78;
     private const double FixedChangePoint = 0.50;
+    private const int FixedAxisSwitchPercent = 84;
 
     public Unit Generate(FloorRules floor, ZodiacSign sign, int seed)
     {
@@ -35,8 +36,8 @@ public sealed class UnitGenerator : IUnitGenerator
         int[] pattern = profile.Modality == Modality.Fixed
             ? PickFixedPattern(random, sides, floor.MaximumSideValue)
             : PickPattern(random, sides, floor.MaximumSideValue);
-        int[] fixedOppositePattern = profile.Modality == Modality.Fixed
-            ? pattern.Select(Unit.OppositeSide).OrderBy(side => side).ToArray()
+        int[] fixedFollowUpPattern = profile.Modality == Modality.Fixed
+            ? PickFixedFollowUpPattern(random, pattern)
             : Array.Empty<int>();
         history.Add(new PatternStep(0, pattern));
 
@@ -54,11 +55,11 @@ public sealed class UnitGenerator : IUnitGenerator
             bool shouldChange = ShouldChange(profile.Modality, distributed, totalToDistribute, iteration, ref thresholdChanged);
             if (remaining > 0 && (added == 0 || shouldChange))
             {
-                int[] availableOpposites = fixedOppositePattern
+                int[] availableFixedSides = fixedFollowUpPattern
                     .Where(side => sides[side] < floor.MaximumSideValue)
                     .ToArray();
-                pattern = profile.Modality == Modality.Fixed && shouldChange && availableOpposites.Length > 0
-                    ? availableOpposites
+                pattern = profile.Modality == Modality.Fixed && shouldChange && availableFixedSides.Length > 0
+                    ? availableFixedSides
                     : PickPattern(random, sides, floor.MaximumSideValue);
                 history.Add(new PatternStep(distributed, pattern));
             }
@@ -135,6 +136,11 @@ public sealed class UnitGenerator : IUnitGenerator
 
         return pattern.OrderBy(side => side).ToArray();
     }
+
+    private static int[] PickFixedFollowUpPattern(IRandomSource random, int[] pattern) => pattern
+        .Select(side => random.Next(0, 100) < FixedAxisSwitchPercent ? Unit.OppositeSide(side) : side)
+        .OrderBy(side => side)
+        .ToArray();
 
     private static void Validate(FloorRules floor)
     {
