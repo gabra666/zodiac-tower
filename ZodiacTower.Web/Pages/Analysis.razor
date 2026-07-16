@@ -1,0 +1,91 @@
+@page "/analisis"
+@inject IUnitGenerator Generator
+
+<PageTitle>Analisis | Zodiac Tower</PageTitle>
+
+<header class="page-heading">
+    <div>
+        <span class="eyebrow">Muestreo estadistico</span>
+        <h1>Analisis de balance</h1>
+        <p>Compara las tres estrategias con muestras equivalentes y detecta especializacion o sesgos laterales.</p>
+    </div>
+</header>
+
+<section class="tool-band">
+    <div class="control-grid compact">
+        <div class="field"><label for="analysis-floor">Piso</label><select id="analysis-floor" @bind="floor">@foreach (var item in FloorCatalog.All) { <option value="@item.Floor">Piso @item.Floor</option> }</select></div>
+        <div class="field"><label for="samples">Muestras por modalidad</label><select id="samples" @bind="samples"><option value="1000">1.000</option><option value="5000">5.000</option><option value="10000">10.000</option></select></div>
+        <div class="field"><label for="analysis-seed">Semilla</label><input id="analysis-seed" type="number" @bind="seed" /></div>
+        <button class="primary-action" disabled="@running" @onclick="RunAnalysis">@(running ? "Calculando..." : "Ejecutar analisis")</button>
+    </div>
+</section>
+
+@if (summaries.Count == 0)
+{
+    <div class="empty-state">Ejecuta una muestra para comparar Cardinal, Fijo y Mutable.</div>
+}
+else
+{
+    <div class="summary-strip">
+        <div class="summary-item"><span>Unidades procesadas</span><strong>@((samples * 3).ToString("N0"))</strong></div>
+        <div class="summary-item"><span>Piso</span><strong>@floor</strong></div>
+        <div class="summary-item"><span>Mayor diferencia media</span><strong>@summaries.Max(item => item.AverageSpread).ToString("0.00")</strong></div>
+        <div class="summary-item"><span>Lados al maximo</span><strong>@summaries.Sum(item => item.MaxedSides).ToString("N0")</strong></div>
+    </div>
+    <div class="analysis-grid">
+        @foreach (var summary in summaries)
+        {
+            <article class="analysis-panel">
+                <h3>@ZodiacText.Modality(summary.Modality)</h3>
+                <p>@summary.Count.ToString("N0") unidades - potencia media @summary.AveragePower.ToString("0.00")</p>
+                <div class="metric-pair">
+                    <div><span>Diferencia media</span><strong>@summary.AverageSpread.ToString("0.00")</strong></div>
+                    <div><span>Especializadas</span><strong>@summary.SpecializedPercent.ToString("0.0")%</strong></div>
+                    <div><span>Equilibradas</span><strong>@summary.BalancedPercent.ToString("0.0")%</strong></div>
+                </div>
+                @for (int side = 0; side < 6; side++)
+                {
+                    int captured = side;
+                    <div class="bar-row"><span>Lado @(captured + 1)</span><div class="bar-track"><div class="bar-fill" style="width: @BarWidth(summary.SideAverages[captured])%"></div></div><strong>@summary.SideAverages[captured].ToString("0.00")</strong></div>
+                }
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private int floor = 4;
+    private int samples = 5000;
+    private int seed = 99173;
+    private bool running;
+    private List<ModalitySummary> summaries = new();
+
+    private async Task RunAnalysis()
+    {
+        running = true;
+        await Task.Yield();
+        var floorRules = FloorCatalog.Get(floor);
+        summaries = Enum.GetValues<Modality>().Select((modality, modalityIndex) =>
+        {
+            ZodiacSign[] signs = ZodiacCatalog.All.Where(profile => profile.Modality == modality).Select(profile => profile.Sign).ToArray();
+            var units = Enumerable.Range(0, samples)
+                .Select(index => Generator.Generate(floorRules, signs[index % signs.Length], unchecked(seed + index + modalityIndex * 1_000_003)))
+                .ToArray();
+            double[] sideAverages = Enumerable.Range(0, 6).Select(side => units.Average(unit => unit.Sides[side])).ToArray();
+            return new ModalitySummary(
+                modality,
+                units.Length,
+                units.Average(unit => unit.TotalPower),
+                units.Average(unit => unit.Spread),
+                units.Count(unit => unit.Spread >= 4) * 100d / units.Length,
+                units.Count(unit => unit.Spread <= 1) * 100d / units.Length,
+                units.Sum(unit => unit.Sides.Count(value => value == floorRules.MaximumSideValue)),
+                sideAverages);
+        }).ToList();
+        running = false;
+    }
+
+    private string BarWidth(double value) => Math.Min(100, value / FloorCatalog.Get(floor).MaximumSideValue * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    private sealed record ModalitySummary(Modality Modality, int Count, double AveragePower, double AverageSpread, double SpecializedPercent, double BalancedPercent, int MaxedSides, double[] SideAverages);
+}

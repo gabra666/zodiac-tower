@@ -1,0 +1,16 @@
+.unit-hex { width: 100%; max-width: 250px; margin: 0 auto; }
+svg { display: block; width: 100%; overflow: visible; }
+.hex-shadow { fill: rgba(18, 24, 35, .14); transform: translateY(5px); }
+.hex-body { fill: var(--element-color); stroke: var(--element-dark); stroke-width: 3; }
+.hex-inner { fill: #fff; fill-opacity: .88; stroke: var(--element-dark); stroke-width: 1.2; }
+line { stroke: var(--element-dark); stroke-width: 1; opacity: .18; }
+.side-disc { fill: #fff; stroke: var(--element-dark); stroke-width: 2; }
+.side-disc.selected { fill: #17202b; stroke: #17202b; stroke-width: 4; }
+.side-value { fill: #17202b; font-size: 16px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+.side-disc.selected + .side-value { fill: #fff; }
+.sign-code { fill: var(--element-dark); font-size: 22px; font-weight: 900; text-anchor: middle; }
+.power-value { fill: #5f6b76; font-size: 14px; font-weight: 700; text-anchor: middle; }
+.fire { --element-color: #e96245; --element-dark: #93301f; }
+.earth { --element-color: #5d9a70; --element-dark: #2d6340; }
+.air { --element-color: #e0b84f; --element-dark: #8b6915; }
+.water { --element-color: #4e8fb8; --element-dark: #245a7b; }

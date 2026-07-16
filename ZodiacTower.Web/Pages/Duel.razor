@@ -1,0 +1,75 @@
+@page "/duelo"
+@inject IUnitGenerator Generator
+@inject BattleService Battles
+
+<PageTitle>Duelo | Zodiac Tower</PageTitle>
+
+<header class="page-heading">
+    <div>
+        <span class="eyebrow">Resolucion de lados</span>
+        <h1>Simulador de duelo</h1>
+        <p>Rota ambas unidades y prueba las ventajas zodiacales sin alterar sus valores base.</p>
+    </div>
+</header>
+
+<section class="tool-band">
+    <div class="control-grid compact">
+        <div class="field"><label for="duel-floor">Piso</label><select id="duel-floor" @bind="floor">@foreach (var item in FloorCatalog.All) { <option value="@item.Floor">Piso @item.Floor</option> }</select></div>
+        <div class="field"><label for="seed-a">Semilla A</label><input id="seed-a" type="number" @bind="seedA" /></div>
+        <div class="field"><label for="seed-b">Semilla B</label><input id="seed-b" type="number" @bind="seedB" /></div>
+        <button class="primary-action" @onclick="CreateUnits">Crear duelo</button>
+    </div>
+    <div class="rule-row">
+        <label class="toggle"><input type="checkbox" @bind="rules.UseElement" /> Ventaja elemental</label>
+        <label class="toggle"><input type="checkbox" @bind="rules.UsePolarity" /> Polaridad opuesta</label>
+        <label class="toggle"><input type="checkbox" @bind="rules.UseModality" /> Ventaja de modalidad</label>
+    </div>
+</section>
+
+@if (unitA is not null && unitB is not null)
+{
+    var result = CurrentResult;
+    <section class="duel-board">
+        <article class="fighter">
+            <div class="fighter-title"><h2>Unidad A - @ZodiacText.Sign(unitA.Sign)</h2><span>Lado @(rotationA + 1)</span></div>
+            <UnitHex Unit="unitA" Rotation="rotationA" SelectedPosition="0" />
+            <div class="rotation-control"><span>Rotacion</span><input type="range" min="0" max="5" @bind="rotationA" @bind:event="oninput" /><output>@rotationA</output></div>
+        </article>
+
+        <div class="versus-panel" aria-live="polite">
+            <div class="score">@result.AttackerFinalValue<span class="score-separator">:</span>@result.DefenderFinalValue</div>
+            <div class="bonus-line">Bonos +@result.AttackerZodiacBonus / +@result.DefenderZodiacBonus</div>
+            <p class="outcome">@ZodiacText.Outcome(result.Outcome)</p>
+        </div>
+
+        <article class="fighter">
+            <div class="fighter-title"><h2>Unidad B - @ZodiacText.Sign(unitB.Sign)</h2><span>Lado @(((rotationB + 3) % 6) + 1)</span></div>
+            <UnitHex Unit="unitB" Rotation="rotationB" SelectedPosition="3" />
+            <div class="rotation-control"><span>Rotacion</span><input type="range" min="0" max="5" @bind="rotationB" @bind:event="oninput" /><output>@rotationB</output></div>
+        </article>
+    </section>
+}
+
+@code {
+    private int floor = 4;
+    private int seedA = 184729;
+    private int seedB = 803112;
+    private int rotationA;
+    private int rotationB;
+    private Unit? unitA;
+    private Unit? unitB;
+    private readonly ZodiacBattleRules rules = new() { UseElement = true };
+
+    private BattleResult CurrentResult => Battles.Resolve(unitA!, rotationA, unitB!, (rotationB + 3) % 6, rules);
+
+    protected override void OnInitialized() => CreateUnits();
+
+    private void CreateUnits()
+    {
+        var floorRules = FloorCatalog.Get(floor);
+        unitA = Generator.Generate(floorRules, (ZodiacSign)Math.Abs(seedA % 12), seedA);
+        unitB = Generator.Generate(floorRules, (ZodiacSign)Math.Abs(seedB % 12), seedB);
+        rotationA = 0;
+        rotationB = 0;
+    }
+}

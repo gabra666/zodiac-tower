@@ -1,0 +1,18 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <aside class="sidebar">
+        <NavMenu />
+    </aside>
+
+    <main>
+        <div class="top-row">
+            <span class="workspace-label">Laboratorio de balance</span>
+            <span class="status-dot" aria-hidden="true"></span>
+            <span class="status-label">Motor local</span>
+        </div>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>

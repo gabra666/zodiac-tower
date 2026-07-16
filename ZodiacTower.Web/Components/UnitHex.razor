@@ -1,0 +1,34 @@
+@if (Unit is not null)
+{
+    var profile = ZodiacCatalog.Get(Unit.Sign);
+    <div class="unit-hex @ZodiacText.ElementClass(profile.Element)">
+        <svg viewBox="0 0 220 210" role="img" aria-label="Unidad @ZodiacText.Sign(Unit.Sign) con poder @Unit.TotalPower">
+            <polygon class="hex-shadow" points="110,10 195,58 195,152 110,200 25,152 25,58" />
+            <polygon class="hex-body" points="110,10 195,58 195,152 110,200 25,152 25,58" />
+            <polygon class="hex-inner" points="110,31 177,69 177,141 110,179 43,141 43,69" />
+            <line x1="110" y1="31" x2="110" y2="179" />
+            <line x1="43" y1="69" x2="177" y2="141" />
+            <line x1="177" y1="69" x2="43" y2="141" />
+            @for (int position = 0; position < 6; position++)
+            {
+                int captured = position;
+                <g>
+                    <circle class="side-disc @(captured == SelectedPosition ? "selected" : string.Empty)" cx="@X[captured]" cy="@Y[captured]" r="17" />
+                    <text class="side-value" x="@X[captured]" y="@(Y[captured] + 1)">@DisplayedSide(captured)</text>
+                </g>
+            }
+            <text class="sign-code" x="110" y="100">@ZodiacText.Sign(Unit.Sign).Substring(0, 2).ToUpperInvariant()</text>
+            <text class="power-value" x="110" y="124">@Unit.TotalPower</text>
+        </svg>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public Unit? Unit { get; set; }
+    [Parameter] public int Rotation { get; set; }
+    [Parameter] public int SelectedPosition { get; set; } = -1;
+
+    private static readonly int[] X = { 110, 174, 174, 110, 46, 46 };
+    private static readonly int[] Y = { 34, 72, 138, 176, 138, 72 };
+    private int DisplayedSide(int position) => Unit!.Sides[(position + Rotation) % 6];
+}

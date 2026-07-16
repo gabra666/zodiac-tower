@@ -1,0 +1,14 @@
+.page { min-height: 100vh; display: flex; background: #f3f5f7; }
+main { min-width: 0; flex: 1; }
+.sidebar { width: 224px; flex: 0 0 224px; min-height: 100vh; background: #17202b; }
+.top-row { height: 58px; padding: 0 30px; display: flex; align-items: center; gap: 9px; background: #fff; border-bottom: 1px solid #dfe3e7; position: sticky; top: 0; z-index: 10; }
+.workspace-label { margin-right: auto; color: #34404c; font-size: .82rem; font-weight: 700; letter-spacing: 0; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4b9564; }
+.status-label { color: #697580; font-size: .78rem; }
+.content { padding: 28px 30px 48px; max-width: 1460px; margin: 0 auto; }
+@media (max-width: 700px) {
+    .page { display: block; }
+    .sidebar { width: 100%; min-height: auto; }
+    .top-row { display: none; }
+    .content { padding: 20px 16px 38px; }
+}

@@ -1,0 +1,112 @@
+@page "/"
+@inject IUnitGenerator Generator
+
+<PageTitle>Generador | Zodiac Tower</PageTitle>
+
+<header class="page-heading">
+    <div>
+        <span class="eyebrow">Generacion procedural</span>
+        <h1>Generador de unidades</h1>
+        <p>Explora distribuciones reproducibles y comprueba como cada modalidad cambia el patron de sus seis lados.</p>
+    </div>
+</header>
+
+<section class="tool-band" aria-label="Parametros de generacion">
+    <div class="control-grid">
+        <div class="field">
+            <label for="floor">Piso</label>
+            <select id="floor" @bind="floor">
+                @foreach (var rules in FloorCatalog.All)
+                {
+                    <option value="@rules.Floor">Piso @rules.Floor - @rules.MinimumBudget a @rules.MaximumBudget</option>
+                }
+            </select>
+        </div>
+        <div class="field">
+            <label for="sign">Signo</label>
+            <select id="sign" @bind="signSelection">
+                <option value="random">Aleatorio</option>
+                @foreach (var sign in Enum.GetValues<ZodiacSign>())
+                {
+                    <option value="@((int)sign)">@ZodiacText.Sign(sign)</option>
+                }
+            </select>
+        </div>
+        <div class="field">
+            <label for="seed">Semilla inicial</label>
+            <input id="seed" type="number" @bind="seed" />
+        </div>
+        <div class="field">
+            <label for="amount">Cantidad</label>
+            <select id="amount" @bind="amount">
+                <option value="1">1 unidad</option>
+                <option value="10">10 unidades</option>
+                <option value="100">100 unidades</option>
+                <option value="1000">1.000 unidades</option>
+            </select>
+        </div>
+        <button class="primary-action" @onclick="Generate">Generar</button>
+    </div>
+</section>
+
+@if (units.Count > 0)
+{
+    var rules = FloorCatalog.Get(floor);
+    <div class="summary-strip">
+        <div class="summary-item"><span>Unidades</span><strong>@units.Count.ToString("N0")</strong></div>
+        <div class="summary-item"><span>Potencia media</span><strong>@units.Average(unit => unit.TotalPower).ToString("0.0")</strong></div>
+        <div class="summary-item"><span>Rango del piso</span><strong>@rules.MinimumBudget - @rules.MaximumBudget</strong></div>
+        <div class="summary-item"><span>Mayor diferencia</span><strong>@units.Max(unit => unit.Spread)</strong></div>
+    </div>
+
+    <div class="section-heading">
+        <h2>Resultados</h2>
+        <span>Se muestran @Math.Min(24, units.Count) de @units.Count.ToString("N0")</span>
+    </div>
+    <div class="unit-grid">
+        @foreach (var unit in units.Take(24))
+        {
+            var profile = ZodiacCatalog.Get(unit.Sign);
+            <article class="unit-card">
+                <div class="unit-card-head">
+                    <div><h3>@ZodiacText.Sign(unit.Sign)</h3><p>Piso @unit.Floor - Poder @unit.TotalPower</p></div>
+                    <span class="seed-tag">#@unit.Seed</span>
+                </div>
+                <UnitHex Unit="unit" />
+                <div class="meta-row">
+                    <span class="meta-chip">@ZodiacText.Element(profile.Element)</span>
+                    <span class="meta-chip">@ZodiacText.Polarity(profile.Polarity)</span>
+                    <span class="meta-chip">@ZodiacText.Modality(profile.Modality)</span>
+                    <span class="meta-chip">Diferencia @unit.Spread</span>
+                </div>
+                <p class="trace">Patrones: @Trace(unit)</p>
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private int floor = 4;
+    private string signSelection = "random";
+    private int seed = 184729;
+    private int amount = 10;
+    private List<Unit> units = new();
+
+    protected override void OnInitialized() => Generate();
+
+    private void Generate()
+    {
+        var rules = FloorCatalog.Get(floor);
+        var signRandom = new StableRandom(seed ^ 0x51A7);
+        units = Enumerable.Range(0, amount)
+            .Select(index => Generator.Generate(rules, ResolveSign(signRandom), unchecked(seed + index)))
+            .ToList();
+    }
+
+    private ZodiacSign ResolveSign(IRandomSource random) => signSelection == "random"
+        ? (ZodiacSign)random.Next(0, 12)
+        : (ZodiacSign)int.Parse(signSelection);
+
+    private static string Trace(Unit unit) => string.Join("  >  ", unit.PatternHistory.Take(5)
+        .Select(step => $"{step.DistributedAt}: [{string.Join(",", step.ActiveSides.Select(side => side + 1))}]"));
+}

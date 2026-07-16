@@ -1,0 +1,13 @@
+.brand-row { height: 68px; padding: 0 14px; border-bottom: 1px solid rgba(255,255,255,.09); }
+.navbar-brand { display: flex; align-items: center; gap: 10px; color: #fff; font-size: .95rem; font-weight: 750; }
+.brand-mark { width: 30px; height: 30px; display: grid; place-items: center; background: #d9aa3e; color: #17202b; border-radius: 4px; font-size: .72rem; font-weight: 900; }
+.navbar-toggler { border: 1px solid rgba(255,255,255,.2); padding: 4px 7px; }
+.nav-scrollable { padding: 20px 12px; }
+.nav-section-label { padding: 0 10px 9px; color: #84909c; font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.nav-item { margin-bottom: 5px; }
+.nav-item ::deep .nav-link { height: 42px; padding: 0 10px; display: flex; align-items: center; gap: 10px; color: #bec7cf; border-radius: 5px; font-size: .86rem; font-weight: 650; }
+.nav-item ::deep .nav-link:hover { background: rgba(255,255,255,.07); color: #fff; }
+.nav-item ::deep .nav-link.active { color: #fff; background: #2d3945; box-shadow: inset 3px 0 #d9aa3e; }
+.nav-glyph { width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: .65rem; font-weight: 900; }
+@media (min-width: 701px) { .navbar-toggler { display: none; } .collapse { display: block; } }
+@media (max-width: 700px) { .brand-row { height: 58px; } .nav-scrollable { padding: 8px 12px 12px; } .nav-section-label { display: none; } }
