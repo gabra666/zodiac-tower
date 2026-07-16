@@ -1,23 +1,51 @@
 .distribution-history {
     margin-top: 12px;
-    padding-top: 10px;
     border-top: 1px solid #edf0f2;
 }
 
-.history-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+.history-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    padding: 10px 1px 2px;
     color: #4e5a66;
     font-size: .7rem;
     font-weight: 800;
+    cursor: pointer;
+    list-style: none;
 }
 
-.history-heading strong {
+.history-summary::-webkit-details-marker {
+    display: none;
+}
+
+.history-summary:focus-visible {
+    outline: 2px solid #7d8b97;
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.history-summary strong {
     color: #818b94;
     font-size: .64rem;
+}
+
+.disclosure-icon {
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid #7b8791;
+    border-bottom: 2px solid #7b8791;
+    transform: rotate(-45deg);
+    transition: transform 140ms ease;
+}
+
+.distribution-history[open] .disclosure-icon {
+    transform: rotate(45deg);
+}
+
+.history-content {
+    padding-top: 8px;
 }
 
 .point-summary {

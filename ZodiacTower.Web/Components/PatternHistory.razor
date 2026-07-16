@@ -4,65 +4,68 @@
     var basePoints = rules.MinimumSideValue * 6;
     var pointsToDistribute = Unit.Budget - basePoints;
 
-    <section class="distribution-history" aria-label="Historial de reparto de puntos">
-        <div class="history-heading">
-            <span>Historial de reparto</span>
+    <details class="distribution-history">
+        <summary class="history-summary">
+            <span class="disclosure-icon" aria-hidden="true"></span>
+            <span>Detalles de la distribucion</span>
             <strong>@Unit.DistributionHistory.Count pasos</strong>
-        </div>
+        </summary>
 
-        <div class="point-summary">
-            <div><span>Base inicial</span><strong>6 x @rules.MinimumSideValue = @basePoints</strong></div>
-            <div><span>Puntos a repartir</span><strong>@pointsToDistribute</strong></div>
-            <div><span>Presupuesto final</span><strong>@Unit.Budget</strong></div>
-        </div>
+        <div class="history-content">
+            <div class="point-summary">
+                <div><span>Base inicial</span><strong>6 x @rules.MinimumSideValue = @basePoints</strong></div>
+                <div><span>Puntos a repartir</span><strong>@pointsToDistribute</strong></div>
+                <div><span>Presupuesto final</span><strong>@Unit.Budget</strong></div>
+            </div>
 
-        <ol class="distribution-list">
-            @for (var index = 0; index < Unit.DistributionHistory.Count; index++)
-            {
-                var step = Unit.DistributionHistory[index];
-                var pending = pointsToDistribute - step.DistributedAfter;
-                <li class="distribution-step">
-                    <div class="step-heading">
-                        <strong>Paso @(index + 1)</strong>
-                        <span>@PointsAddedText(step.PointsAdded)</span>
-                    </div>
-                    <div class="pattern-applied">
-                        <svg class="pattern-map" viewBox="0 0 62 58" role="img" aria-label="Lados @AppliedSideText(step) reciben un punto">
-                            <polygon points="31,3 56,16 56,42 31,55 6,42 6,16" />
-                            @for (var side = 0; side < SidePositions.Length; side++)
-                            {
-                                var position = SidePositions[side];
-                                var isApplied = step.AppliedSides.Contains(side);
-                                <g>
-                                    <circle class="@(isApplied ? "applied" : null)" cx="@position.X" cy="@position.Y" r="6" />
-                                    <text class="@(isApplied ? "applied" : null)" x="@position.X" y="@position.Y">@(side + 1)</text>
-                                </g>
-                            }
-                        </svg>
-                        <div>
-                            <span>Patron aplicado</span>
-                            <strong>Lados @AppliedSideText(step) reciben +1</strong>
+            <ol class="distribution-list">
+                @for (var index = 0; index < Unit.DistributionHistory.Count; index++)
+                {
+                    var step = Unit.DistributionHistory[index];
+                    var pending = pointsToDistribute - step.DistributedAfter;
+                    <li class="distribution-step">
+                        <div class="step-heading">
+                            <strong>Paso @(index + 1)</strong>
+                            <span>@PointsAddedText(step.PointsAdded)</span>
                         </div>
-                    </div>
-                    <div class="state-change">
-                        <div class="side-state">
-                            <span>Antes</span>
-                            <div class="side-values">@SideValues(step.SidesBefore)</div>
+                        <div class="pattern-applied">
+                            <svg class="pattern-map" viewBox="0 0 62 58" role="img" aria-label="Lados @AppliedSideText(step) reciben un punto">
+                                <polygon points="31,3 56,16 56,42 31,55 6,42 6,16" />
+                                @for (var side = 0; side < SidePositions.Length; side++)
+                                {
+                                    var position = SidePositions[side];
+                                    var isApplied = step.AppliedSides.Contains(side);
+                                    <g>
+                                        <circle class="@(isApplied ? "applied" : null)" cx="@position.X" cy="@position.Y" r="6" />
+                                        <text class="@(isApplied ? "applied" : null)" x="@position.X" y="@position.Y">@(side + 1)</text>
+                                    </g>
+                                }
+                            </svg>
+                            <div>
+                                <span>Patron aplicado</span>
+                                <strong>Lados @AppliedSideText(step) reciben +1</strong>
+                            </div>
                         </div>
-                        <span class="state-arrow" aria-hidden="true">&rarr;</span>
-                        <div class="side-state">
-                            <span>Despues</span>
-                            <div class="side-values">@SideValues(step.SidesAfter)</div>
+                        <div class="state-change">
+                            <div class="side-state">
+                                <span>Antes</span>
+                                <div class="side-values">@SideValues(step.SidesBefore)</div>
+                            </div>
+                            <span class="state-arrow" aria-hidden="true">&rarr;</span>
+                            <div class="side-state">
+                                <span>Despues</span>
+                                <div class="side-values">@SideValues(step.SidesAfter)</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="step-totals">
-                        <span>@step.DistributedAfter repartidos</span>
-                        <span>@pending pendientes</span>
-                    </div>
-                </li>
-            }
-        </ol>
-    </section>
+                        <div class="step-totals">
+                            <span>@step.DistributedAfter repartidos</span>
+                            <span>@pending pendientes</span>
+                        </div>
+                    </li>
+                }
+            </ol>
+        </div>
+    </details>
 }
 
 @code {
