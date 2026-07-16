@@ -32,7 +32,12 @@ public sealed class UnitGenerator : IUnitGenerator
         var profile = ZodiacCatalog.Get(sign);
         var history = new List<PatternStep>();
         var distributionHistory = new List<DistributionStep>();
-        int[] pattern = PickPattern(random, sides, floor.MaximumSideValue);
+        int[] pattern = profile.Modality == Modality.Fixed
+            ? PickFixedPattern(random, sides, floor.MaximumSideValue)
+            : PickPattern(random, sides, floor.MaximumSideValue);
+        int[] fixedOppositePattern = profile.Modality == Modality.Fixed
+            ? pattern.Select(Unit.OppositeSide).OrderBy(side => side).ToArray()
+            : Array.Empty<int>();
         history.Add(new PatternStep(0, pattern));
 
         while (remaining > 0)
@@ -49,7 +54,12 @@ public sealed class UnitGenerator : IUnitGenerator
             bool shouldChange = ShouldChange(profile.Modality, distributed, totalToDistribute, iteration, ref thresholdChanged);
             if (remaining > 0 && (added == 0 || shouldChange))
             {
-                pattern = PickPattern(random, sides, floor.MaximumSideValue);
+                int[] availableOpposites = fixedOppositePattern
+                    .Where(side => sides[side] < floor.MaximumSideValue)
+                    .ToArray();
+                pattern = profile.Modality == Modality.Fixed && shouldChange && availableOpposites.Length > 0
+                    ? availableOpposites
+                    : PickPattern(random, sides, floor.MaximumSideValue);
                 history.Add(new PatternStep(distributed, pattern));
             }
         }
@@ -103,6 +113,27 @@ public sealed class UnitGenerator : IUnitGenerator
         }
 
         return available.Take(Math.Min(3, available.Count)).OrderBy(index => index).ToArray();
+    }
+
+    private static int[] PickFixedPattern(IRandomSource random, int[] sides, int maximum)
+    {
+        var pattern = new List<int>(3);
+        for (int side = 0; side < 3; side++)
+        {
+            int opposite = Unit.OppositeSide(side);
+            int selected = random.Next(0, 2) == 0 ? side : opposite;
+            int fallback = selected == side ? opposite : side;
+
+            if (sides[selected] < maximum)
+                pattern.Add(selected);
+            else if (sides[fallback] < maximum)
+                pattern.Add(fallback);
+        }
+
+        if (pattern.Count == 0)
+            throw new InvalidOperationException("No fixed side pair can receive the remaining budget.");
+
+        return pattern.OrderBy(side => side).ToArray();
     }
 
     private static void Validate(FloorRules floor)

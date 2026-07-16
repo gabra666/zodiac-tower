@@ -1,4 +1,5 @@
 using ZodiacTower.Core.Generation;
+using ZodiacTower.Core.Units;
 using ZodiacTower.Core.Zodiac;
 
 namespace ZodiacTower.Core.Tests;
@@ -63,5 +64,24 @@ public sealed class UnitGeneratorTests
         Assert.Equal(3, unit.DistributionHistory.Count);
         Assert.Equal(pointsToDistribute, unit.DistributionHistory.Sum(step => step.PointsAdded));
         Assert.All(unit.DistributionHistory, step => Assert.True(step.PointsAdded > 0));
+    }
+
+    [Fact]
+    public void FixedUnitsSwitchToTheOppositePattern()
+    {
+        foreach (var floor in FloorCatalog.All)
+        {
+            for (int seed = 1; seed <= 100; seed++)
+            {
+                var unit = _generator.Generate(floor, ZodiacSign.Taurus, seed);
+
+                Assert.Equal(2, unit.PatternHistory.Count);
+                int[] expectedOpposites = unit.PatternHistory[0].ActiveSides
+                    .Select(Unit.OppositeSide)
+                    .OrderBy(side => side)
+                    .ToArray();
+                Assert.Equal(expectedOpposites, unit.PatternHistory[1].ActiveSides);
+            }
+        }
     }
 }
