@@ -1,7 +1,7 @@
 @if (Unit is not null)
 {
     var profile = ZodiacCatalog.Get(Unit.Sign);
-    <div class="unit-hex @ZodiacText.ElementClass(profile.Element)">
+    <div class="unit-hex @ZodiacText.ElementClass(profile.Element) @OwnerClass">
         <svg viewBox="0 0 220 210" role="img" aria-label="Unidad @ZodiacText.Sign(Unit.Sign) con poder @Unit.TotalPower">
             <polygon class="hex-shadow" points="110,10 195,58 195,152 110,200 25,152 25,58" />
             <polygon class="hex-body" points="110,10 195,58 195,152 110,200 25,152 25,58" />
@@ -27,6 +27,7 @@
     [Parameter, EditorRequired] public Unit? Unit { get; set; }
     [Parameter] public int Rotation { get; set; }
     [Parameter] public int SelectedPosition { get; set; } = -1;
+    [Parameter] public string? OwnerClass { get; set; }
 
     private static readonly int[] X = { 148, 186, 148, 72, 34, 72 };
     private static readonly int[] Y = { 42, 105, 168, 168, 105, 42 };

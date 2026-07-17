@@ -14,3 +14,7 @@ line { stroke: var(--element-dark); stroke-width: 1; opacity: .18; }
 .earth { --element-color: #5d9a70; --element-dark: #2d6340; }
 .air { --element-color: #e0b84f; --element-dark: #8b6915; }
 .water { --element-color: #4e8fb8; --element-dark: #245a7b; }
+.player-owned { --element-color: #438dcc; --element-dark: #174f7d; }
+.enemy-owned { --element-color: #d85c57; --element-dark: #87312d; }
+.board-unit .side-value { font-size: 21px; }
+.board-unit .sign-code { font-size: 24px; }
